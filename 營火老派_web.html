@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fireside Pie 營火老派</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      background: #050505;
+      color: #f5f5f5;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* LOGO 背景浮水印 */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url("S__645210170_0.jpg");
+      background-repeat: repeat-y;
+      background-position: center top;
+      background-size: min(92vw, 430px);
+      opacity: 0.14;
+      z-index: 0;
+      pointer-events: none;
+      filter: brightness(0.95);
+    }
+
+    @media (max-width: 430px) {
+      body::before {
+        background-size: 95vw;
+        background-repeat: repeat-y;
+        background-position: center top;
+        opacity: 0.15;
+      }
+    }
+
+    main, section, nav, header, footer, .card, .product, .product-info {
+      position: relative;
+      z-index: 2;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 430px;
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 18px 16px 90px;
+    }
+
+    header {
+      text-align: center;
+      padding: 12px 0 18px;
+    }
+
+    .logo {
+      width: 82px;
+      height: 82px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+
+    h1 {
+      font-size: 1.55rem;
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      color: #d8d8d8;
+      letter-spacing: 1px;
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 26px;
+      padding: 20px 0 12px;
+      margin-top: 10px;
+      background: transparent;
+    }
+
+    nav button {
+      border: none;
+      background: transparent;
+      color: rgba(255,255,255,0.72);
+      padding: 4px 2px 10px;
+      border-radius: 0;
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      cursor: pointer;
+      transition: all 0.28s ease;
+      position: relative;
+    }
+
+    nav button::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 0%;
+      height: 2px;
+      background: #73835f;
+      transition: width 0.28s ease;
+      border-radius: 999px;
+    }
+
+    nav button.active {
+      color: #dce7cf;
+      font-weight: 700;
+    }
+
+    nav button.active::after {
+      width: 100%;
+    }
+
+    nav button:hover {
+      color: #ffffff;
+    }
+
+    nav button:hover::after {
+      width: 100%;
+    }
+
+    .page {
+      display: none;
+      animation: fadeIn 0.35s ease;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 跑馬燈輪播 */
+    .marquee-wrapper {
+      width: 100%;
+      overflow: hidden;
+      border-radius: 24px;
+      margin: 18px 0;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+    }
+
+    .marquee-track {
+      display: flex;
+      width: max-content;
+      animation: marquee 36s linear infinite;
+    }
+
+    .marquee-track img {
+      width: 260px;
+      height: 260px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    .card {
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      padding: 20px 6px;
+      margin-top: 18px;
+      box-shadow: none;
+    }
+
+    .card h2 {
+      font-size: 1.4rem;
+      margin-bottom: 18px;
+      letter-spacing: 2px;
+      text-shadow: 0 3px 12px rgba(0,0,0,0.7);
+    }
+
+    .intro-lines p,
+    .content p {
+      font-size: 0.95rem;
+      line-height: 1.85;
+      color: #f3f3f3;
+      padding: 4px 0;
+      border: none;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.6);
+    }
+
+    .product-grid {
+      display: flex;
+      flex-direction: column;
+      margin-top: 10px;
+    }
+
+    .product {
+      display: grid;
+      grid-template-columns: 96px 1fr;
+      gap: 14px;
+      align-items: center;
+      padding: 16px 0;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 0;
+      overflow: visible;
+    }
+
+    .product:last-child {
+      border-bottom: none;
+    }
+
+    .product img {
+      width: 96px;
+      height: 96px;
+      object-fit: cover;
+      display: block;
+      border-radius: 18px;
+    }
+
+    .product-info {
+      padding: 0;
+    }
+
+    .product-info h3 {
+      font-size: 1.05rem;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+    }
+
+    .product-info p {
+      font-size: 0.88rem;
+      line-height: 1.6;
+      color: #dcdcdc;
+    }
+
+    .qr-note {
+      margin-top: 22px;
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.08);
+      font-size: 0.88rem;
+      line-height: 1.7;
+      color: #f0f0f0;
+      text-align: center;
+    }
+
+    footer {
+      text-align: center;
+      color: #aaa;
+      font-size: 0.78rem;
+      margin-top: 32px;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+    <header>
+      <img src="S__645210170_0.jpg" alt="Fireside Pie LOGO" class="logo" />
+      <h1>Fireside Pie</h1>
+      <p class="subtitle">營火老派｜手作鹹派與甜點</p>
+    </header>
+
+    <nav>
+      <button class="tab-btn active" onclick="showPage('home', this)">主頁</button>
+      <button class="tab-btn" onclick="showPage('about', this)">關於我們</button>
+      <button class="tab-btn" onclick="showPage('products', this)">商品介紹</button>
+      <button class="tab-btn" onclick="showPage('contact', this)">聯繫我們</button>
+    </nav>
+
+    <!-- 主頁 -->
+    <section id="home" class="page active">
+      <div class="marquee-wrapper">
+        <div class="marquee-track">
+          <img src="S__645505036_0.jpg" alt="營火老派鹹派照片" />
+          <img src="S__645505037_0.jpg" alt="營火老派鹹派照片" />
+          <img src="S__645505039_0.jpg" alt="營火老派鹹派照片" />
+          <img src="S__645505040_0.jpg" alt="營火老派甜點照片" />
+          <img src="S__645505038_0.jpg" alt="營火老派鹹派照片" />
+
+          <!-- 重複一組讓跑馬燈無縫銜接 -->
+          <img src="S__645505036_0.jpg" alt="營火老派鹹派照片" />
+          <img src="S__645505037_0.jpg" alt="營火老派鹹派照片" />
+          <img src="S__645505039_0.jpg" alt="營火老派鹹派照片" />
+          <img src="S__645505040_0.jpg" alt="營火老派甜點照片" />
+          <img src="S__645505038_0.jpg" alt="營火老派鹹派照片" />
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>品牌簡介</h2>
+        <div class="intro-lines">
+          <p>簡介</p>
+          <p>簡介</p>
+          <p>簡介</p>
+          <p>簡介</p>
+          <p>簡介</p>
+          <p>簡介</p>
+          <p>簡介</p>
+          <p>簡介</p>
+          <p>簡介</p>
+          <p>簡介</p>
+        </div>
+      </div>
+
+   
+        
+      </div>
+    </section>
+
+    <!-- 關於我們 -->
+    <section id="about" class="page">
+      <div class="card content">
+        <h2>關於我們</h2>
+        <p>簡介</p>
+        <p>簡介</p>
+        <p>簡介</p>
+        <p>簡介</p>
+        <p>簡介</p>
+        <p>簡介</p>
+        <p>簡介</p>
+        <p>簡介</p>
+        <p>簡介</p>
+        <p>簡介</p>
+      </div>
+    </section>
+
+    <!-- 商品介紹 -->
+    <section id="products" class="page">
+      <div class="card">
+        <h2>商品介紹</h2>
+
+        <div class="product-grid">
+          <div class="product">
+            <img src="S__645505036_0.jpg" alt="商品照片" />
+            <div class="product-info">
+              <h3>商品品名</h3>
+              <p>品項簡介</p>
+            </div>
+          </div>
+
+          <div class="product">
+            <img src="S__645505037_0.jpg" alt="商品照片" />
+            <div class="product-info">
+              <h3>商品品名</h3>
+              <p>品項簡介</p>
+            </div>
+          </div>
+
+          <div class="product">
+            <img src="S__645505039_0.jpg" alt="商品照片" />
+            <div class="product-info">
+              <h3>商品品名</h3>
+              <p>品項簡介</p>
+            </div>
+          </div>
+
+          <div class="product">
+            <img src="S__645505040_0.jpg" alt="商品照片" />
+            <div class="product-info">
+              <h3>商品品名</h3>
+              <p>品項簡介</p>
+            </div>
+          </div>
+
+          <div class="product">
+            <img src="S__645505038_0.jpg" alt="商品照片" />
+            <div class="product-info">
+              <h3>商品品名</h3>
+              <p>品項簡介</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 聯繫我們 -->
+    <section id="contact" class="page">
+      <div class="card content">
+        <h2>聯繫我們</h2>
+        <p>Instagram：連結貼上處</p>
+        <p>LINE ID：連結貼上處</p>
+      </div>
+    </section>
+
+    <footer>
+      © 2026 Handmade Dessert Brand
+    </footer>
+  </main>
+
+  <script>
+    function showPage(pageId, button) {
+      const pages = document.querySelectorAll('.page');
+      const buttons = document.querySelectorAll('.tab-btn');
+
+      pages.forEach(page => page.classList.remove('active'));
+      buttons.forEach(btn => btn.classList.remove('active'));
+
+      document.getElementById(pageId).classList.add('active');
+      button.classList.add('active');
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>
+
+
+
+
+
+
